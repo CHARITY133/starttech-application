@@ -1,15 +1,17 @@
 # ---- Build stage ----
-FROM golang:1.22-alpine AS builder
+FROM golang:1.25-alpine AS builder
 WORKDIR /app
+
 COPY go.mod go.sum ./
 RUN go mod download
+
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /backend-api .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /much-to-do ./cmd/api/main.go
 
 # ---- Runtime stage ----
 FROM gcr.io/distroless/static-debian12
 WORKDIR /
-COPY --from=builder /backend-api /backend-api
+COPY --from=builder /much-to-do /much-to-do
 EXPOSE 8080
 USER nonroot:nonroot
-ENTRYPOINT ["/backend-api"]
+ENTRYPOINT ["/much-to-do"]

@@ -18,8 +18,8 @@ npm audit --audit-level=high || true
 echo "==> Building production bundle"
 npm run build
 
-echo "==> Syncing build/ to s3://${S3_BUCKET}"
-aws s3 sync build/ "s3://${S3_BUCKET}" --delete
+echo "==> Syncing dist/ to s3://${S3_BUCKET}"
+aws s3 sync dist/ "s3://${S3_BUCKET}" --delete
 
 echo "==> Invalidating CloudFront cache"
 aws cloudfront create-invalidation \

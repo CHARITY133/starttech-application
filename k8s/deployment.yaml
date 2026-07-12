@@ -21,33 +21,76 @@ spec:
     spec:
       containers:
         - name: backend-api
-          # Replaced by the backend-ci-cd.yml pipeline with
-          # <account_id>.dkr.ecr.<region>.amazonaws.com/starttech-backend-api:<git-sha>
           image: PLACEHOLDER_ECR_IMAGE:latest
           ports:
             - containerPort: 8080
           env:
-            - name: REDIS_HOST
-              valueFrom:
-                secretKeyRef:
-                  name: backend-secrets
-                  key: redis-host
+            - name: PORT
+              value: "8080"
             - name: MONGO_URI
               valueFrom:
                 secretKeyRef:
                   name: backend-secrets
                   key: mongo-uri
-            - name: PORT
-              value: "8080"
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: db-name
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: jwt-secret-key
+            - name: JWT_EXPIRATION_HOURS
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: jwt-expiration-hours
+            - name: ENABLE_CACHE
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: enable-cache
+            - name: REDIS_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: redis-addr
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: log-level
+            - name: LOG_FORMAT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: log-format
+            - name: SECURE_COOKIE
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: secure-cookie
+            - name: COOKIE_DOMAINS
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: cookie-domains
+            - name: ALLOWED_ORIGINS
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: allowed-origins
           readinessProbe:
             httpGet:
-              path: /api/v1/health
+              path: /api/health
               port: 8080
             initialDelaySeconds: 5
             periodSeconds: 10
           livenessProbe:
             httpGet:
-              path: /api/v1/health
+              path: /api/health
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 20

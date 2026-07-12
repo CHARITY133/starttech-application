@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # health-check.sh
-# Curls the unified CloudFront domain's /api/v1/health endpoint.
+# Curls the unified CloudFront domain's /api/health endpoint.
 # Usage: ./health-check.sh https://d1234abcd.cloudfront.net
 set -euo pipefail
 
 BASE_URL="${1:?Usage: $0 <base_url e.g. https://d1234abcd.cloudfront.net>}"
-ENDPOINT="${BASE_URL%/}/api/v1/health"
+ENDPOINT="${BASE_URL%/}/api/health"
 
 echo "==> Checking ${ENDPOINT}"
 
