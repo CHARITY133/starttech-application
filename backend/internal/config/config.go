@@ -28,7 +28,6 @@ func LoadConfig(path string) (config Config, err error) {
 	viper.AddConfigPath(path)
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
-
 	viper.AutomaticEnv()
 
 	// Set default values
@@ -38,6 +37,20 @@ func LoadConfig(path string) (config Config, err error) {
 	viper.SetDefault("COOKIE_DOMAINS", []string{"localhost"})
 	viper.SetDefault("SECURE_COOKIE", false)
 	viper.SetDefault("ALLOWED_ORIGINS", []string{"http://localhost:5173"})
+
+	// Explicitly bind every remaining field to its environment variable.
+	// viper.AutomaticEnv() alone does NOT make Unmarshal() pick up env vars
+	// that were never registered via SetDefault/BindEnv/config file - without
+	// this, MONGO_URI, DB_NAME, JWT_SECRET_KEY, REDIS_ADDR, REDIS_PASSWORD,
+	// LOG_LEVEL, and LOG_FORMAT would silently unmarshal as empty strings
+	// even when set correctly in the environment.
+	_ = viper.BindEnv("MONGO_URI")
+	_ = viper.BindEnv("DB_NAME")
+	_ = viper.BindEnv("JWT_SECRET_KEY")
+	_ = viper.BindEnv("REDIS_ADDR")
+	_ = viper.BindEnv("REDIS_PASSWORD")
+	_ = viper.BindEnv("LOG_LEVEL")
+	_ = viper.BindEnv("LOG_FORMAT")
 
 	err = viper.ReadInConfig()
 	if err != nil {
@@ -56,7 +69,6 @@ func LoadConfig(path string) (config Config, err error) {
 		parts := strings.Split(allowedOrigins, ",")
 		var cleaned []string
 		for _, p := range parts {
-			// Trim spaces and quotes
 			trimmed := strings.TrimSpace(p)
 			trimmed = strings.Trim(trimmed, "\"'")
 			if trimmed != "" {
@@ -70,7 +82,6 @@ func LoadConfig(path string) (config Config, err error) {
 		parts := strings.Split(cookieDomains, ",")
 		var cleaned []string
 		for _, p := range parts {
-			// Trim spaces and quotes
 			trimmed := strings.TrimSpace(p)
 			trimmed = strings.Trim(trimmed, "\"'")
 			if trimmed != "" {
