@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: backend-api
-          image: PLACEHOLDER_ECR_IMAGE:latest
+          image: 427882481715.dkr.ecr.us-east-1.amazonaws.com/starttech-backend-api:v1
           ports:
             - containerPort: 8080
           env:
@@ -53,6 +53,11 @@ spec:
                   name: backend-config
                   key: enable-cache
             - name: REDIS_ADDR
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: redis-addr
+            - name: REDIS_HOST
               valueFrom:
                 secretKeyRef:
                   name: backend-secrets
